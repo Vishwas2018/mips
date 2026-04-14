@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindMosaic — Sign In / Sign Up</title>
+
+  <!-- Fonts: DM Sans (body) + DM Serif Display (display headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Reset ─────────────────────────────────────────────────── */
+    *, *::before, *::after {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    body { background: #F5F3FF; color: #1e1b4b; font-size: 15px; line-height: 1.65; }
+
+    /* ─── Tokens ────────────────────────────────────────────────── */
+    :root {
+      --primary:       #6C3AED;
+      --primary-d:     #5B21B6;
+      --primary-ink:   #3B0764;
+      --primary-l:     #EDE9FE;
+      --ring:          rgba(108,58,237,.14);
+
+      --bg:            #F5F3FF;
+      --surface:       #FFFFFF;
+      --surface-alt:   #FAF9FE;
+      --field-bg:      #FAF9FE;
+
+      --border:        #E9E5F5;
+      --border-strong: #D6D0E8;
+
+      --text:          #1E1B4B;
+      --text-2:        #3B3566;
+      --muted:         #7C7399;
+      --muted-2:       #A8A0C0;
+
+      --success:       #16A34A;
+      --success-bg:    #F0FDF4;
+      --error:         #DC2626;
+      --error-bg:      #FEF2F2;
+
+      --shadow-card:
+        0 0 0 1px rgba(30,27,75,.03),
+        0 1px 2px rgba(108,58,237,.04),
+        0 8px 16px -4px rgba(108,58,237,.06),
+        0 24px 56px -16px rgba(30,27,75,.13);
+      --shadow-form:
+        0 0 0 1px rgba(30,27,75,.02),
+        0 2px 8px rgba(108,58,237,.08);
+    }
+
+    /* ─── SVG icon base ────────────────────────────────────────── */
+    .ico { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ico svg { display: block; }
+
+    /* ─── Wrapper ───────────────────────────────────────────────── */
+    .codepen-wrapper {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; width: 100%;
+      background:
+        radial-gradient(1400px 700px at 10% -15%, rgba(108,58,237,.05), transparent 55%),
+        radial-gradient(1000px 600px at 95% 105%, rgba(108,58,237,.04), transparent 55%),
+        var(--bg);
+      padding: 2rem;
+    }
+
+    /* ─── Brand pill ───────────────────────────────────────────── */
+    .brand-pill {
+      position: absolute;
+      top: 1.5rem; right: 1.75rem;
+      z-index: 20;
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .85rem; font-weight: 700; letter-spacing: -.01em;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .brand-pill .brand-icon {
+      width: 28px; height: 28px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(108,58,237,.25);
+    }
+    .brand-pill .brand-icon svg { color: #fff; }
+
+    /* ─── Back to home ──────────────────────────────────────────── */
+    .back-to-home {
+      position: absolute; top: 1.5rem; left: 1.5rem; z-index: 20;
+      display: inline-flex; align-items: center; gap: .3rem;
+      text-decoration: none; color: #fff;
+      font-weight: 600; font-size: .78rem;
+      padding: .4rem .75rem .4rem .55rem;
+      background: var(--primary);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 999px;
+      transition: background .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 2px 6px rgba(108,58,237,.3);
+    }
+    .back-to-home:hover {
+      background: var(--primary-d);
+      box-shadow: 0 4px 12px rgba(108,58,237,.4);
+      transform: translateY(-1px);
+    }
+    .back-to-home:active { transform: translateY(0); }
+
+    /* ─── Container ─────────────────────────────────────────────── */
+    .container {
+      position: relative; height: 680px; width: 1060px;
+      max-width: 100%; overflow: hidden;
+      background-color: var(--surface);
+      border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* ─── Gradient blob ─────────────────────────────────────────── */
+    .container::before {
+      content: ""; position: absolute; top: -50%; right: 0;
+      height: 200%; width: 300%;
+      transform: translate(35%, 0);
+      background-image:
+        radial-gradient(ellipse 500px 350px at 25% 35%, rgba(139,92,246,.2), transparent 70%),
+        radial-gradient(ellipse 350px 250px at 75% 75%, rgba(59,7,100,.25), transparent 70%),
+        linear-gradient(145deg, #8B5CF6 0%, var(--primary) 30%, var(--primary-d) 55%, var(--primary-ink) 100%);
+      transition: transform 1.2s cubic-bezier(.25,1,.5,1),
+                  right     1.2s cubic-bezier(.25,1,.5,1);
+      z-index: 6;
+      border-bottom-right-radius: 50%;
+      border-top-left-radius: 50%;
+    }
+    .container.sign-in::before { transform: translate(0,0); right: 50%; }
+    .container.sign-up::before { transform: translate(100%,0); right: 50%; }
+
+    /* ─── Grid ──────────────────────────────────────────────────── */
+    .row { display: flex; flex-wrap: wrap; height: 100%; }
+    .col { width: 50%; }
+    .align-items-center { display: flex; align-items: center; justify-content: center; text-align: center; }
+    .flex-col { flex-direction: column; }
+
+    /* ─── Overlay text ──────────────────────────────────────────── */
+    .content-row { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 8; width: 100%; }
+    .text { margin: 4rem; color: #fff; }
+    .text h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.5rem; font-weight: 400; letter-spacing: -.02em;
+      margin: 1rem 0 .5rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,.1);
+      transition: transform 1.2s cubic-bezier(.25,1,.5,1), opacity 1.2s cubic-bezier(.25,1,.5,1);
+    }
+    .text p {
+      font-size: .85rem; opacity: .82; max-width: 260px; margin: 0 auto;
+      line-height: 1.6; font-weight: 400;
+      transition: transform 1.2s cubic-bezier(.25,1,.5,1), opacity 1.2s cubic-bezier(.25,1,.5,1);
+    }
+    .text.sign-in h2, .text.sign-in p { transform: translateX(-250%); opacity: 0; }
+    .text.sign-up h2, .text.sign-up p { transform: translateX(250%); opacity: 0; }
+    .container.sign-in .text.sign-in h2,
+    .container.sign-in .text.sign-in p,
+    .container.sign-up .text.sign-up h2,
+    .container.sign-up .text.sign-up p { transform: translateX(0); opacity: 1; }
+
+    /* ─── Form wrapper ──────────────────────────────────────────── */
+    .form-wrapper { width: 100%; max-width: 25rem; }
+
+    /* ─── Form card ─────────────────────────────────────────────── */
+    .form {
+      padding: 1.6rem 1.5rem; background-color: var(--surface);
+      border: 1px solid var(--border); border-radius: 14px;
+      width: 100%; box-shadow: var(--shadow-form);
+      opacity: 0; visibility: hidden; transform: translateY(14px);
+      transition: transform .3s ease-in, opacity .3s ease-in, visibility .3s;
+    }
+    .container.sign-in .form.sign-in,
+    .container.sign-up .form.sign-up {
+      opacity: 1; visibility: visible; transform: translateY(0);
+      transition: transform .5s ease-out .6s, opacity .5s ease-out .6s, visibility 0s .6s;
+    }
+
+    /* ─── Form header ──────────────────────────────────────────── */
+    .form-header { text-align: left; margin-bottom: 1rem; }
+    .form-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem; font-weight: 400; letter-spacing: -.015em;
+      color: var(--text); line-height: 1.2;
+    }
+    .form-header p { margin-top: .3rem; font-size: .8rem; color: var(--muted); line-height: 1.5; }
+
+    /* ─── Input group ──────────────────────────────────────────── */
+    .input-group { position: relative; width: 100%; margin: .6rem 0; }
+    .input-group input {
+      width: 100%; height: 44px;
+      padding: 0 2.5rem 0 2.35rem;
+      font-size: .84rem; font-weight: 500; font-family: inherit;
+      background-color: var(--field-bg); border-radius: 10px;
+      border: 1.5px solid var(--border-strong); outline: none;
+      color: var(--text);
+      transition: border-color .2s, box-shadow .2s, background-color .2s;
+    }
+    .input-group input::placeholder { color: transparent; }
+    .input-group input:hover:not(:focus) { border-color: var(--muted-2); background-color: var(--surface-alt); }
+    .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); background-color: var(--surface); }
+    .input-group input.error-field { border-color: var(--error); box-shadow: 0 0 0 3px rgba(220,38,38,.08); }
+    .input-group input.success-field { border-color: var(--success); box-shadow: 0 0 0 3px rgba(22,163,74,.07); }
+
+    /* Floating label */
+    .floating-label {
+      position: absolute; left: 2.25rem; top: 50%;
+      transform: translateY(-50%); color: var(--muted);
+      font-size: .84rem; font-weight: 500;
+      pointer-events: none; background-color: transparent;
+      padding: 0 .3rem;
+      transition: all .22s cubic-bezier(.4,0,.2,1);
+    }
+    .input-group input:focus ~ .floating-label,
+    .input-group input:not(:placeholder-shown) ~ .floating-label {
+      top: 0; left: .6rem;
+      transform: translateY(-50%); font-size: .62rem; font-weight: 600;
+      color: var(--primary); background-color: var(--surface);
+      letter-spacing: .03em;
+    }
+    .input-group input.error-field ~ .floating-label { color: var(--error); }
+    .input-group input.success-field:not(:focus) ~ .floating-label { color: var(--success); }
+
+    /* Input icon */
+    .input-group .input-icon {
+      position: absolute; top: 50%; left: .75rem;
+      transform: translateY(-50%); color: var(--muted-2);
+      transition: color .22s; pointer-events: none;
+    }
+    .input-group .input-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .input-group input:focus ~ .input-icon,
+    .input-group input:not(:placeholder-shown) ~ .input-icon { color: var(--primary); }
+    .input-group input.error-field ~ .input-icon { color: var(--error); }
+
+    /* Toggle visibility */
+    .toggle-visibility {
+      position: absolute; top: 22px; right: .5rem;
+      transform: translateY(-50%); background: transparent;
+      border: 0; cursor: pointer; color: var(--muted-2);
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .2s, background-color .2s;
+    }
+    .toggle-visibility svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .toggle-visibility:hover { color: var(--text-2); background-color: var(--surface-alt); }
+
+    /* Field error & hint */
+    .field-error { color: var(--error); font-size: .66rem; margin-top: .2rem; margin-left: .15rem; text-align: left; font-weight: 500; }
+    .field-error:empty { display: none; }
+    .field-hint { color: var(--muted); font-size: .66rem; margin-top: .25rem; margin-left: .15rem; text-align: left; display: flex; align-items: center; gap: .25rem; transition: color .2s; }
+    .field-hint.success { color: var(--success); font-weight: 600; }
+    .field-hint.error { color: var(--error); font-weight: 600; }
+    .field-hint:empty { display: none; }
+
+    /* Password rules */
+    .pw-rules { margin-top: .4rem; display: flex; flex-wrap: wrap; gap: .25rem; padding: 0; }
+    .pw-rules li {
+      list-style: none; font-size: .62rem; color: var(--muted);
+      display: inline-flex; align-items: center; gap: .2rem;
+      font-weight: 500; padding: .15rem .4rem .15rem .25rem;
+      border-radius: 999px; background: var(--surface-alt);
+      border: 1px solid var(--border);
+      transition: color .25s, background-color .25s, border-color .25s;
+    }
+    .pw-rules li .rule-icon { width: 12px; height: 12px; display: inline-flex; align-items: center; }
+    .pw-rules li .rule-icon svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .pw-rules li.ok { color: var(--success); background: var(--success-bg); border-color: #bbf7d0; }
+
+    /* ─── Primary button ────────────────────────────────────────── */
+    .btn-primary {
+      cursor: pointer; width: 100%; height: 46px;
+      border-radius: 10px; border: none;
+      background: linear-gradient(180deg, #8B5CF6 0%, var(--primary) 50%, var(--primary-d) 100%);
+      color: #fff; font-size: .88rem; font-weight: 600;
+      display: flex; justify-content: center; align-items: center; gap: .5rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 1px 2px rgba(108,58,237,.2), 0 6px 16px -6px rgba(108,58,237,.4);
+      transition: background .25s, transform .1s, box-shadow .25s;
+      margin-top: .6rem; position: relative; overflow: hidden;
+    }
+    .btn-primary::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 60%); pointer-events: none; }
+    .btn-primary:hover {
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-d) 50%, var(--primary-ink) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 1px 2px rgba(91,33,182,.22), 0 10px 24px -8px rgba(91,33,182,.5);
+      transform: translateY(-.5px);
+    }
+    .btn-primary:active { transform: translateY(.5px); }
+    .btn-primary:disabled { background: var(--muted-2); box-shadow: none; cursor: not-allowed; transform: none; }
+    .btn-primary:disabled::before { display: none; }
+
+    /* ─── Footer links ──────────────────────────────────────────── */
+    .form-footer { margin: .5rem 0 0; font-size: .76rem; color: var(--muted); text-align: center; }
+    .inline-row { display: flex; align-items: center; justify-content: space-between; margin-top: .15rem; font-size: .74rem; }
+    .link-btn {
+      cursor: pointer; border: 0; background: transparent; padding: 0;
+      font-size: inherit; font-weight: 600; color: var(--primary);
+      transition: color .18s;
+    }
+    .link-btn:hover { color: var(--primary-d); text-decoration: underline; text-underline-offset: 2px; }
+
+    .trial-link { margin-top: .45rem; text-align: center; font-size: .72rem; color: var(--muted); }
+    .trial-link a { color: var(--primary); font-weight: 600; text-decoration: none; margin-left: .25rem; transition: color .18s; }
+    .trial-link a:hover { color: var(--primary-d); text-decoration: underline; }
+
+    /* ─── Notice ────────────────────────────────────────────────── */
+    .auth-notice { border-radius: 8px; padding: .45rem .7rem; font-size: .74rem; margin-top: .45rem; text-align: left; line-height: 1.4; }
+    .auth-notice.error   { background: var(--error-bg); border: 1px solid #fecaca; color: #991b1b; }
+    .auth-notice.success { background: var(--success-bg); border: 1px solid #bbf7d0; color: #166534; }
+    .auth-notice.info    { background: #EDE9FE; border: 1px solid #C4B5FD; color: var(--primary-ink); }
+    .auth-notice:empty   { display: none; }
+
+    /* ─── Social divider ────────────────────────────────────────── */
+    .social-divider {
+      display: flex; align-items: center; gap: .6rem;
+      margin: .65rem 0 .5rem; color: var(--muted-2);
+      font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .14em;
+    }
+    .social-divider::before, .social-divider::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+    }
+
+    /* ─── Social buttons — full-width pill style ────────────────── */
+    .social-list { display: flex; flex-direction: column; gap: .4rem; }
+    .social-btn {
+      cursor: pointer; width: 100%; height: 38px;
+      border-radius: 999px; display: flex; align-items: center;
+      justify-content: center; gap: .5rem;
+      font-size: .78rem; font-weight: 500; font-family: inherit;
+      background: var(--surface); color: var(--text);
+      border: 1.5px solid var(--border-strong);
+      transition: border-color .2s, background-color .2s, box-shadow .2s, transform .15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .social-btn:hover {
+      border-color: var(--muted-2); background: var(--surface-alt);
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+      transform: translateY(-1px);
+    }
+    .social-btn:active { transform: translateY(0); }
+    .social-btn .social-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+
+    /* ─── Help block ────────────────────────────────────────────── */
+    .help-block {
+      margin-top: .6rem; padding-top: .55rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      gap: .45rem; font-size: .66rem; color: var(--muted); flex-wrap: wrap;
+    }
+    .help-block a { color: var(--text-2); font-weight: 500; text-decoration: none; transition: color .18s; }
+    .help-block a:hover { color: var(--primary); }
+    .help-block .sep { display: inline-block; width: 2.5px; height: 2.5px; border-radius: 50%; background: var(--border-strong); }
+
+    /* ─── Modal ──────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(30,27,75,.45); backdrop-filter: blur(6px);
+      z-index: 100; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--surface); border-radius: 16px;
+      padding: 2rem 2rem 1.75rem; max-width: 420px; width: 100%;
+      box-shadow: 0 24px 56px -12px rgba(30,27,75,.25);
+      position: relative;
+      animation: modalIn .3s ease-out;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal h2 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--text); margin-bottom: .5rem; font-weight: 400; }
+    .modal p { font-size: .84rem; color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+    .modal .modal-input {
+      width: 100%; height: 44px; padding: 0 .85rem;
+      font-size: .84rem; font-weight: 500; font-family: inherit;
+      background: var(--field-bg); border: 1.5px solid var(--border-strong);
+      border-radius: 10px; outline: none; color: var(--text);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .modal .modal-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); }
+    .modal .modal-actions { display: flex; gap: .5rem; margin-top: 1rem; }
+    .modal .modal-btn-primary {
+      flex: 1; height: 42px; border-radius: 10px; border: none;
+      background: var(--primary); color: #fff; font-size: .84rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .modal .modal-btn-primary:hover { background: var(--primary-d); }
+    .modal .modal-btn-secondary {
+      height: 42px; padding: 0 1.25rem; border-radius: 10px;
+      border: 1.5px solid var(--border-strong); background: var(--surface);
+      color: var(--text-2); font-size: .84rem; font-weight: 500;
+      cursor: pointer; transition: border-color .2s;
+    }
+    .modal .modal-btn-secondary:hover { border-color: var(--muted-2); }
+    .modal .close-btn {
+      position: absolute; top: .75rem; right: .75rem;
+      width: 28px; height: 28px; border-radius: 8px;
+      border: none; background: transparent; cursor: pointer;
+      color: var(--muted); display: flex; align-items: center; justify-content: center;
+      transition: background .2s, color .2s;
+    }
+    .modal .close-btn:hover { background: var(--surface-alt); color: var(--text); }
+    .modal .close-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .modal .placeholder-features { margin: .75rem 0; padding: 0; }
+    .modal .placeholder-features li {
+      list-style: none; font-size: .8rem; color: var(--text-2);
+      padding: .35rem 0; display: flex; align-items: center; gap: .4rem;
+    }
+    .modal .placeholder-features li svg { width: 14px; height: 14px; stroke: var(--primary); fill: none; stroke-width: 2.5; flex-shrink: 0; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 560px) {
+      .codepen-wrapper { padding: 0; }
+      .container { height: 100vh; border-radius: 0; }
+      .container::before, .container.sign-in::before, .container.sign-up::before {
+        height: 100vh; border-bottom-right-radius: 0; border-top-left-radius: 0;
+        z-index: 0; transform: none; right: 0;
+      }
+      .content-row { align-items: flex-start !important; }
+      .content-row .col { background-color: unset; }
+      .col {
+        width: 100%; position: absolute; padding: 2rem 1.25rem;
+        background-color: var(--surface);
+        border-top-left-radius: 2rem; border-top-right-radius: 2rem;
+        transform: translateY(100%); transition: 1s ease-in-out;
+      }
+      .container.sign-in .col.sign-in, .container.sign-up .col.sign-up { transform: translateY(0); }
+      .row { align-items: flex-end; justify-content: flex-end; }
+      .form { box-shadow: none; margin: 0; padding: 0; border: none; }
+      .text { margin: 2rem; }
+      .text p { display: none; }
+      .text h2 { margin: .5rem; font-size: 2rem; }
+      .brand-pill { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="codepen-wrapper">
+
+    <!-- Brand -->
+    <a href="#" class="brand-pill">
+      <span class="brand-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      MindMosaic
+    </a>
+
+    <!-- Back to Home -->
+    <a href="#" class="back-to-home">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back to Home
+    </a>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div id="container" class="container sign-in">
+      <div class="row">
+
+        <!-- ── SIGN UP ─────────────────────────────────────── -->
+        <div class="col align-items-center flex-col sign-up">
+          <div class="form-wrapper align-items-center">
+            <form class="form sign-up" id="signup-form" novalidate>
+              <div class="form-header">
+                <h1>Create your account</h1>
+                <p>Adaptive practice, weekly plans, and smarter exam prep.</p>
+              </div>
+
+              <!-- Name -->
+              <div class="input-group">
+                <input id="su-name" type="text" placeholder=" " autocomplete="name" />
+                <label class="floating-label" for="su-name">Display name</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <div class="field-error" id="su-name-error"></div>
+              </div>
+
+              <!-- Email -->
+              <div class="input-group">
+                <input id="su-email" type="email" placeholder=" " autocomplete="email" />
+                <label class="floating-label" for="su-email">Email address</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg></span>
+                <div class="field-error" id="su-email-error"></div>
+              </div>
+
+              <!-- Password -->
+              <div class="input-group">
+                <input id="su-password" type="password" placeholder=" " autocomplete="new-password" />
+                <label class="floating-label" for="su-password">Password</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+                <button type="button" class="toggle-visibility" data-target="su-password" aria-label="Show password">
+                  <svg class="eye-show" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-hide" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 01-4.24-4.24"/></svg>
+                </button>
+                <ul class="pw-rules" id="su-pw-rules" aria-live="polite">
+                  <li data-rule="len"><span class="rule-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>8+ chars</li>
+                  <li data-rule="upper"><span class="rule-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>Uppercase</li>
+                  <li data-rule="lower"><span class="rule-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>Lowercase</li>
+                  <li data-rule="num"><span class="rule-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></span>Number</li>
+                </ul>
+                <div class="field-error" id="su-password-error"></div>
+              </div>
+
+              <!-- Confirm -->
+              <div class="input-group">
+                <input id="su-confirm" type="password" placeholder=" " autocomplete="new-password" />
+                <label class="floating-label" for="su-confirm">Confirm password</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+                <button type="button" class="toggle-visibility" data-target="su-confirm" aria-label="Show password">
+                  <svg class="eye-show" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-hide" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 01-4.24-4.24"/></svg>
+                </button>
+                <div class="field-hint" id="su-confirm-hint"></div>
+                <div class="field-error" id="su-confirm-error"></div>
+              </div>
+
+              <div class="auth-notice" id="su-notice" role="alert"></div>
+              <button type="submit" class="btn-primary" id="su-submit">Create account</button>
+
+              <p class="trial-link">Just exploring?<a href="#" onclick="openModal('trial-modal');return false;">Try sample exams →</a></p>
+              <p class="form-footer">Already have an account?&nbsp;<button type="button" class="link-btn" onclick="switchMode('sign-in')">Sign in</button></p>
+
+              <div class="social-divider">Or continue with</div>
+              <div class="social-list">
+                <button type="button" class="social-btn" title="Google" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></span>
+                  Sign in with Google
+                </button>
+                <button type="button" class="social-btn" title="Facebook" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/></svg></span>
+                  Sign in with Facebook
+                </button>
+                <button type="button" class="social-btn" title="Apple" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="#000"/></svg></span>
+                  Sign in with Apple
+                </button>
+              </div>
+
+              <div class="help-block">
+                <a href="#" onclick="openModal('contact-modal');return false;">Need help?</a>
+                <span class="sep"></span>
+                <a href="#" onclick="openModal('contact-modal');return false;">Contact us</a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ── SIGN IN ─────────────────────────────────────── -->
+        <div class="col align-items-center flex-col sign-in">
+          <div class="form-wrapper align-items-center">
+            <form class="form sign-in" id="signin-form" novalidate>
+              <div class="form-header">
+                <h1>Welcome back</h1>
+                <p>Sign in to continue your learning journey.</p>
+              </div>
+
+              <!-- Email -->
+              <div class="input-group">
+                <input id="si-email" type="email" placeholder=" " autocomplete="email" />
+                <label class="floating-label" for="si-email">Email address</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg></span>
+                <div class="field-error" id="si-email-error"></div>
+              </div>
+
+              <!-- Password -->
+              <div class="input-group">
+                <input id="si-password" type="password" placeholder=" " autocomplete="current-password" />
+                <label class="floating-label" for="si-password">Password</label>
+                <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+                <button type="button" class="toggle-visibility" data-target="si-password" aria-label="Show password">
+                  <svg class="eye-show" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-hide" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/><path d="M14.12 14.12a3 3 0 01-4.24-4.24"/></svg>
+                </button>
+                <div class="field-error" id="si-password-error"></div>
+              </div>
+
+              <div class="inline-row">
+                <span></span>
+                <button type="button" class="link-btn" onclick="openModal('forgot-modal')">Forgot password?</button>
+              </div>
+
+              <div class="auth-notice" id="si-notice" role="alert"></div>
+              <button type="submit" class="btn-primary" id="si-submit">Sign in</button>
+
+              <p class="trial-link">New here?<a href="#" onclick="openModal('trial-modal');return false;">Start a free trial →</a></p>
+              <p class="form-footer">Don't have an account?&nbsp;<button type="button" class="link-btn" onclick="switchMode('sign-up')">Create an account</button></p>
+
+              <div class="social-divider">Or continue with</div>
+              <div class="social-list">
+                <button type="button" class="social-btn" title="Google" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></span>
+                  Sign in with Google
+                </button>
+                <button type="button" class="social-btn" title="Facebook" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/></svg></span>
+                  Sign in with Facebook
+                </button>
+                <button type="button" class="social-btn" title="Apple" onclick="socialDemo(this)">
+                  <span class="social-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" fill="#000"/></svg></span>
+                  Sign in with Apple
+                </button>
+              </div>
+
+              <div class="help-block">
+                <a href="#" onclick="openModal('contact-modal');return false;">Need help?</a>
+                <span class="sep"></span>
+                <a href="#" onclick="openModal('contact-modal');return false;">Contact us</a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Overlay text -->
+      <div class="row content-row">
+        <div class="col align-items-center flex-col">
+          <div class="text sign-in">
+            <h2>Welcome</h2>
+            <p>Pick up right where you left off and keep your streak alive.</p>
+          </div>
+        </div>
+        <div class="col align-items-center flex-col">
+          <div class="text sign-up">
+            <h2>Get Started</h2>
+            <p>Create your MindMosaic account in under a minute.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODALS ═══════════════════════════════════════ -->
+
+  <!-- Forgot Password -->
+  <div class="modal-overlay" id="forgot-modal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('forgot-modal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h2>Reset your password</h2>
+      <p>Enter the email address associated with your account and we'll send you a link to reset your password.</p>
+      <input type="email" class="modal-input" id="forgot-email" placeholder="you@example.com" />
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('forgot-modal')">Cancel</button>
+        <button class="modal-btn-primary" onclick="handleForgot()">Send reset link</button>
+      </div>
+      <div class="auth-notice" id="forgot-notice" role="alert" style="margin-top:.75rem"></div>
+    </div>
+  </div>
+
+  <!-- Free Trial -->
+  <div class="modal-overlay" id="trial-modal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('trial-modal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h2>Try MindMosaic free</h2>
+      <p>Explore sample exams and see how adaptive learning works — no account needed.</p>
+      <ul class="placeholder-features">
+        <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> NAPLAN practice papers (Years 3–9)</li>
+        <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ICAS sample questions across all subjects</li>
+        <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Instant scoring and worked solutions</li>
+        <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> See how the adaptive engine adjusts difficulty</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('trial-modal')">Maybe later</button>
+        <button class="modal-btn-primary" onclick="alert('This would navigate to the sample exam page.');closeModal('trial-modal')">Start sample exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="modal-overlay" id="contact-modal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('contact-modal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h2>Get in touch</h2>
+      <p>Our support team is here to help with any questions about your account, exams, or the platform.</p>
+      <ul class="placeholder-features">
+        <li><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> support@mindmosaic.com.au</li>
+        <li><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.11 2 2 0 014.11 2h3a2 2 0 012 1.72c.13.81.36 1.61.68 2.36a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.75.32 1.55.55 2.36.68A2 2 0 0122 16.92z"/></svg> 1800 MIND MOSAIC (placeholder)</li>
+        <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> help.mindmosaic.com.au (placeholder)</li>
+      </ul>
+      <p style="font-size:.76rem;color:var(--muted);margin-top:.5rem">Response times: typically within 4 business hours.</p>
+      <div class="modal-actions">
+        <button class="modal-btn-primary" onclick="closeModal('contact-modal')">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ─── Mode toggle ──────────────────────────────────────────── */
+    const container = document.getElementById('container');
+    function switchMode(mode) {
+      container.classList.remove('sign-in','sign-up');
+      container.classList.add(mode);
+      clearNotice('si-notice'); clearNotice('su-notice');
+    }
+
+    /* ─── Password visibility ──────────────────────────────────── */
+    document.querySelectorAll('.toggle-visibility').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.querySelector('.eye-show').style.display = isHidden ? 'none' : 'block';
+        btn.querySelector('.eye-hide').style.display = isHidden ? 'block' : 'none';
+        btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      });
+    });
+
+    /* ─── Social demo ──────────────────────────────────────────── */
+    function socialDemo(btn) {
+      const provider = btn.getAttribute('title');
+      const form = btn.closest('.form');
+      const noticeId = form.classList.contains('sign-in') ? 'si-notice' : 'su-notice';
+      setNotice(noticeId, 'info', `${provider} sign-in would open here (mockup only).`);
+    }
+
+    /* ─── Modal management ─────────────────────────────────────── */
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); });
+    });
+
+    /* ─── Forgot password handler ──────────────────────────────── */
+    function handleForgot() {
+      const email = document.getElementById('forgot-email').value.trim();
+      const notice = document.getElementById('forgot-notice');
+      if (!email || !isValidEmail(email)) {
+        notice.className = 'auth-notice error';
+        notice.innerHTML = 'Please enter a valid email address.';
+        return;
+      }
+      notice.className = 'auth-notice success';
+      notice.innerHTML = `A reset link has been sent to <strong>${escHtml(email)}</strong>. Check your inbox.`;
+    }
+
+    /* ─── Live email validation ────────────────────────────────── */
+    ['si-email','su-email'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => {
+        const errEl = document.getElementById(id + '-error');
+        if (!el.value) { el.classList.remove('error-field','success-field'); errEl.textContent = ''; return; }
+        if (isValidEmail(el.value)) {
+          el.classList.remove('error-field'); el.classList.add('success-field'); errEl.textContent = '';
+        } else {
+          el.classList.remove('success-field'); el.classList.add('error-field');
+          errEl.textContent = 'Please enter a valid email address.';
+        }
+      });
+      el.addEventListener('blur', () => { if (el.value && !isValidEmail(el.value)) el.classList.add('error-field'); });
+    });
+
+    /* ─── Live password rules ──────────────────────────────────── */
+    const suPw = document.getElementById('su-password');
+    const suConfirm = document.getElementById('su-confirm');
+    const ruleEls = {
+      len:   document.querySelector('#su-pw-rules [data-rule="len"]'),
+      upper: document.querySelector('#su-pw-rules [data-rule="upper"]'),
+      lower: document.querySelector('#su-pw-rules [data-rule="lower"]'),
+      num:   document.querySelector('#su-pw-rules [data-rule="num"]'),
+    };
+    const checkSvg = '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>';
+    const circleSvg = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>';
+
+    function evalRules(v) {
+      return { len: v.length >= 8, upper: /[A-Z]/.test(v), lower: /[a-z]/.test(v), num: /[0-9]/.test(v) };
+    }
+    suPw.addEventListener('input', () => {
+      const r = evalRules(suPw.value);
+      Object.entries(r).forEach(([k, ok]) => {
+        const li = ruleEls[k];
+        li.classList.toggle('ok', ok);
+        li.querySelector('.rule-icon').innerHTML = ok ? checkSvg : circleSvg;
+      });
+      const allOk = Object.values(r).every(Boolean);
+      suPw.classList.toggle('success-field', allOk && suPw.value.length > 0);
+      suPw.classList.toggle('error-field', !allOk && suPw.value.length > 0 && document.activeElement !== suPw);
+      document.getElementById('su-password-error').textContent = '';
+      if (suConfirm.value) evalConfirm();
+    });
+
+    function evalConfirm() {
+      const hint = document.getElementById('su-confirm-hint');
+      const errEl = document.getElementById('su-confirm-error');
+      errEl.textContent = '';
+      if (!suConfirm.value) { hint.textContent = ''; hint.className = 'field-hint'; suConfirm.classList.remove('success-field','error-field'); return; }
+      if (suConfirm.value === suPw.value) {
+        hint.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Passwords match</span>';
+        hint.className = 'field-hint success';
+        suConfirm.classList.remove('error-field'); suConfirm.classList.add('success-field');
+      } else {
+        hint.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Passwords do not match</span>';
+        hint.className = 'field-hint error';
+        suConfirm.classList.remove('success-field'); suConfirm.classList.add('error-field');
+      }
+    }
+    suConfirm.addEventListener('input', evalConfirm);
+
+    /* ─── Sign-in submit ───────────────────────────────────────── */
+    document.getElementById('signin-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearErrors(['si-email-error','si-password-error']); clearNotice('si-notice');
+      const email = document.getElementById('si-email').value.trim();
+      const password = document.getElementById('si-password').value;
+      let valid = true;
+      if (!email || !isValidEmail(email)) { showFieldError('si-email','si-email-error','Enter a valid email address.'); valid = false; }
+      if (!password) { showFieldError('si-password','si-password-error','Password is required.'); valid = false; }
+      if (!valid) return;
+      const btn = document.getElementById('si-submit');
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      await fakeDelay(1200);
+      setNotice('si-notice','success','✓ Signed in! You would now see the dashboard.');
+      btn.textContent = 'Sign in'; btn.disabled = false;
+    });
+
+    /* ─── Sign-up submit ───────────────────────────────────────── */
+    document.getElementById('signup-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearErrors(['su-name-error','su-email-error','su-password-error','su-confirm-error']); clearNotice('su-notice');
+      const name = document.getElementById('su-name').value.trim();
+      const email = document.getElementById('su-email').value.trim();
+      const password = document.getElementById('su-password').value;
+      const confirm = document.getElementById('su-confirm').value;
+      let valid = true;
+      if (name.length < 2) { showFieldError('su-name','su-name-error','Display name must be at least 2 characters.'); valid = false; }
+      if (!email || !isValidEmail(email)) { showFieldError('su-email','su-email-error','Enter a valid email address.'); valid = false; }
+      if (!isStrongPassword(password)) { showFieldError('su-password','su-password-error','Password must meet all requirements above.'); valid = false; }
+      if (password !== confirm) { showFieldError('su-confirm','su-confirm-error','Passwords do not match.'); valid = false; }
+      if (!valid) return;
+      const btn = document.getElementById('su-submit');
+      btn.disabled = true; btn.textContent = 'Creating account…';
+      await fakeDelay(1400);
+      setNotice('su-notice','success','✓ Account created! You would be signed in automatically.');
+      btn.textContent = 'Create account'; btn.disabled = false;
+    });
+
+    /* ─── Helpers ──────────────────────────────────────────────── */
+    function fakeDelay(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+    function isStrongPassword(v) { return v.length >= 8 && /[A-Z]/.test(v) && /[a-z]/.test(v) && /[0-9]/.test(v); }
+    function showFieldError(inputId, errorId, msg) { document.getElementById(inputId).classList.add('error-field'); document.getElementById(errorId).textContent = msg; }
+    function clearErrors(ids) { ids.forEach(id => document.getElementById(id).textContent = ''); document.querySelectorAll('.error-field').forEach(el => el.classList.remove('error-field')); }
+    function setNotice(id, tone, html) { const el = document.getElementById(id); el.className = 'auth-notice ' + tone; el.innerHTML = html; }
+    function clearNotice(id) { const el = document.getElementById(id); el.className = 'auth-notice'; el.innerHTML = ''; }
+    function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  </script>
+</body>
+</html>

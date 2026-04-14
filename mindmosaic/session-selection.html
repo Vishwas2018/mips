@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WattleMind — Start a Session</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              50:'#f0f5ff',100:'#e0ebff',200:'#b8d0fe',300:'#85b0fc',
+              400:'#5a8ef5',500:'#3b6ce6',600:'#2952c5',700:'#1e3f9e',
+              800:'#163180',900:'#0f2260',
+            },
+            slate: {
+              25:'#fcfcfd',50:'#f8f9fb',75:'#f3f4f7',100:'#eef0f4',
+              150:'#e4e7ed',200:'#d5d9e2',300:'#b0b7c5',400:'#8b94a6',
+              500:'#6b7488',600:'#525b6e',700:'#3d4555',800:'#2a3040',
+              900:'#181c27',950:'#0e1118',
+            },
+          },
+          boxShadow: {
+            'card':'0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+            'card-hover':'0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
+            'elevated':'0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    :root {
+      --fast: 150ms cubic-bezier(0.4,0,0.2,1);
+      --base: 200ms cubic-bezier(0.4,0,0.2,1);
+      --slow: 400ms cubic-bezier(0.4,0,0.2,1);
+      --r-card: 16px;
+      --r-btn: 8px;
+      --r-pill: 9999px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #f8f9fb;
+      color: #2a3040;
+    }
+
+    /* ── Nav ── */
+    .nav-link { font-size: 14px; font-weight: 500; color: #6b7488; padding: 6px 12px; border-radius: 6px; transition: all var(--fast); text-decoration: none; }
+    .nav-link:hover { color: #2a3040; background: #f3f4f7; }
+    .nav-link-active { color: #3b6ce6; background: #f0f5ff; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; font-size: 14px; line-height: 1; border-radius: var(--r-btn); padding: 10px 18px; transition: all var(--fast); cursor: pointer; border: none; outline: none; }
+    .btn:focus-visible { box-shadow: 0 0 0 3px rgba(59,108,230,0.25); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #3b6ce6; color: white; }
+    .btn-primary:hover { background: #2952c5; }
+    .btn-secondary { background: white; color: #3b6ce6; border: 1px solid #e0ebff; }
+    .btn-secondary:hover { background: #f0f5ff; border-color: #b8d0fe; }
+    .btn-ghost { background: transparent; color: #525b6e; }
+    .btn-ghost:hover { background: #f3f4f7; color: #2a3040; }
+    .btn-lg { padding: 14px 28px; font-size: 15px; font-weight: 600; }
+
+    /* ── Mode cards ── */
+    .mode-card {
+      position: relative;
+      background: white;
+      border: 2px solid #eef0f4;
+      border-radius: 20px;
+      padding: 40px 36px;
+      cursor: pointer;
+      transition: border-color var(--base), box-shadow var(--base), transform var(--base);
+      text-align: left;
+      overflow: hidden;
+    }
+    .mode-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity var(--base);
+      border-radius: 18px;
+    }
+    .mode-card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+      transform: translateY(-3px);
+    }
+    .mode-card:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59,108,230,0.25), 0 12px 40px rgba(0,0,0,0.10);
+    }
+
+    /* Practice card */
+    .mode-card.practice:hover { border-color: #85b0fc; }
+    .mode-card.practice .mode-icon-wrap { background: #f0f5ff; }
+    .mode-card.practice .mode-icon { color: #3b6ce6; }
+    .mode-card.practice .mode-cta { background: #3b6ce6; color: white; }
+    .mode-card.practice .mode-cta:hover { background: #2952c5; }
+
+    /* Exam card */
+    .mode-card.exam:hover { border-color: #fde68a; }
+    .mode-card.exam .mode-icon-wrap { background: #fffbeb; }
+    .mode-card.exam .mode-icon { color: #d97706; }
+    .mode-card.exam .mode-cta { background: #d97706; color: white; }
+    .mode-card.exam .mode-cta:hover { background: #b45309; }
+
+    .mode-icon-wrap {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+    }
+    .mode-icon svg { width: 28px; height: 28px; }
+
+    .mode-title { font-size: 24px; font-weight: 700; color: #181c27; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .mode-subtitle { font-size: 14px; font-weight: 600; color: #8b94a6; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+    .mode-desc { font-size: 15px; color: #525b6e; line-height: 1.65; margin-bottom: 28px; }
+
+    .feature-list { list-style: none; padding: 0; margin: 0 0 32px; display: flex; flex-direction: column; gap: 10px; }
+    .feature-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3d4555; font-weight: 500; }
+    .feature-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .practice .feature-dot { background: #3b6ce6; }
+    .exam .feature-dot { background: #d97706; }
+
+    .mode-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 15px; font-weight: 600; padding: 13px 24px;
+      border-radius: 10px; border: none; cursor: pointer;
+      transition: all var(--fast); width: 100%; justify-content: center;
+    }
+    .mode-cta:active { transform: scale(0.97); }
+    .mode-cta svg { width: 18px; height: 18px; transition: transform var(--fast); }
+    .mode-cta:hover svg { transform: translateX(3px); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d5d9e2; border-radius: 100px; }
+
+    /* ── Page fade-in ── */
+    main { animation: fadeIn 300ms ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Subject chip ── */
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: var(--r-pill); font-size: 12px; font-weight: 500; border: 1px solid #eef0f4; color: #525b6e; background: white; cursor: pointer; transition: all var(--fast); }
+    .chip:hover { border-color: #b8d0fe; background: #f0f5ff; color: #3b6ce6; }
+    .chip.chip-sel { border-color: #3b6ce6; background: #f0f5ff; color: #3b6ce6; }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- ================================================================ -->
+  <!-- HEADER                                                            -->
+  <!-- ================================================================ -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+    <div class="max-w-[1360px] mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-10">
+        <a href="dashboard.html" class="flex items-center gap-2.5" aria-label="WattleMind home">
+          <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
+          </div>
+          <span class="text-[17px] font-semibold tracking-tight text-slate-900">WattleMind</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-1">
+          <a href="dashboard.html" class="nav-link">Dashboard</a>
+          <a href="learn.html" class="nav-link">Learn</a>
+          <a href="session-selection.html" class="nav-link nav-link-active" aria-current="page">Practice</a>
+          <a href="results.html" class="nav-link">Results</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <button class="btn btn-ghost p-2 rounded-lg relative" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-white"></span>
+        </button>
+        <div class="h-5 w-px bg-slate-150"></div>
+        <button class="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 transition-colors">
+          <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-semibold">V</div>
+          <div class="hidden sm:block text-left">
+            <p class="text-sm font-medium text-slate-800 leading-none">Vish</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Year 7</p>
+          </div>
+          <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================ -->
+  <!-- MAIN                                                              -->
+  <!-- ================================================================ -->
+  <main class="max-w-[1100px] mx-auto px-6 lg:px-8 pb-24">
+
+    <!-- ── Page header ── -->
+    <div class="pt-12 pb-10 text-center">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400 mb-3">Choose your session type</p>
+      <h1 class="text-[32px] font-bold tracking-tight text-slate-900 mb-3">How do you want to study today?</h1>
+      <p class="text-[15px] text-slate-500 max-w-md mx-auto">Select a mode to begin. You can switch any time from the dashboard.</p>
+    </div>
+
+    <!-- ── Subject filter ── -->
+    <div class="flex flex-wrap items-center justify-center gap-2 mb-12">
+      <span class="text-[13px] font-medium text-slate-400 mr-1">Subject:</span>
+      <button class="chip chip-sel">All subjects</button>
+      <button class="chip">Numeracy</button>
+      <button class="chip">Reading</button>
+      <button class="chip">Writing</button>
+      <button class="chip">Science</button>
+      <button class="chip">Language Conventions</button>
+    </div>
+
+    <!-- ── Mode cards ── -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+
+      <!-- Practice Mode -->
+      <div class="mode-card practice" tabindex="0" role="button" aria-label="Start Practice Mode" onclick="document.location='practice.html'">
+        <div class="mode-icon-wrap">
+          <span class="mode-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </span>
+        </div>
+
+        <p class="mode-subtitle">Practice Mode</p>
+        <h2 class="mode-title">Build your skills</h2>
+        <p class="mode-desc">Work through questions at your own pace. Get instant feedback after each answer and explanations to understand the concept — not just the answer.</p>
+
+        <ul class="feature-list">
+          <li><span class="feature-dot"></span>Instant feedback on every answer</li>
+          <li><span class="feature-dot"></span>Worked explanations shown immediately</li>
+          <li><span class="feature-dot"></span>Adaptive difficulty based on your performance</li>
+          <li><span class="feature-dot"></span>Pause and resume anytime</li>
+        </ul>
+
+        <button class="mode-cta" onclick="event.stopPropagation(); document.location='practice.html'">
+          Start Practising
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+
+        <!-- Recommended badge -->
+        <div class="absolute top-5 right-5">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-600 font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-full px-2.5 py-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+            Recommended
+          </span>
+        </div>
+      </div>
+
+      <!-- Exam Simulation -->
+      <div class="mode-card exam" tabindex="0" role="button" aria-label="Start Exam Simulation" onclick="document.location='exam engine.html'">
+        <div class="mode-icon-wrap">
+          <span class="mode-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+        </div>
+
+        <p class="mode-subtitle">Exam Simulation</p>
+        <h2 class="mode-title">Test under pressure</h2>
+        <p class="mode-desc">Sit a timed, exam-condition assessment mirroring NAPLAN, ICAS, or Selective Entry format. No hints. Results and full review when you finish.</p>
+
+        <ul class="feature-list">
+          <li><span class="feature-dot"></span>Timed — mirrors real exam conditions</li>
+          <li><span class="feature-dot"></span>No feedback during the session</li>
+          <li><span class="feature-dot"></span>Full performance review on completion</li>
+          <li><span class="feature-dot"></span>Score benchmarked against year level</li>
+        </ul>
+
+        <button class="mode-cta" onclick="event.stopPropagation(); document.location='exam engine.html'">
+          Start Exam Sim
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Recent sessions ── -->
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-[15px] font-semibold text-slate-800">Recent sessions</h2>
+        <a href="results.html" class="text-[13px] font-medium text-brand-500 hover:text-brand-600 transition-colors">View all results →</a>
+      </div>
+      <div class="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-card">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8b94a6;border-bottom:1px solid #eef0f4;">Session</th>
+              <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8b94a6;border-bottom:1px solid #eef0f4;">Type</th>
+              <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8b94a6;border-bottom:1px solid #eef0f4;">Subject</th>
+              <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8b94a6;border-bottom:1px solid #eef0f4;">Score</th>
+              <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#8b94a6;border-bottom:1px solid #eef0f4;">Date</th>
+              <th style="border-bottom:1px solid #eef0f4;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="cursor:pointer;transition:background 150ms;" onmouseover="this.style.background='#f8f9fb'" onmouseout="this.style.background=''">
+              <td style="padding:13px 20px;border-bottom:1px solid #f3f4f7;font-weight:500;color:#2a3040;">NAPLAN-style Numeracy</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;">
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;background:#fffbeb;color:#b45309;border:1px solid #fef3c7;">Exam Sim</span>
+              </td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;color:#525b6e;">Numeracy</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;">
+                <span style="font-weight:700;color:#16a34a;">82%</span>
+                <span style="font-size:12px;color:#8b94a6;margin-left:4px;">↑ 6%</span>
+              </td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;color:#8b94a6;">Today, 9:14 am</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;text-align:right;">
+                <a href="results.html" style="font-size:13px;font-weight:500;color:#3b6ce6;text-decoration:none;">Review →</a>
+              </td>
+            </tr>
+            <tr style="cursor:pointer;transition:background 150ms;" onmouseover="this.style.background='#f8f9fb'" onmouseout="this.style.background=''">
+              <td style="padding:13px 20px;border-bottom:1px solid #f3f4f7;font-weight:500;color:#2a3040;">Reading Comprehension</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;">
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;background:#f0f5ff;color:#2952c5;border:1px solid #e0ebff;">Practice</span>
+              </td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;color:#525b6e;">Reading</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;">
+                <span style="font-weight:700;color:#2a3040;">24/30</span>
+                <span style="font-size:12px;color:#8b94a6;margin-left:4px;">80%</span>
+              </td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;color:#8b94a6;">Yesterday</td>
+              <td style="padding:13px 16px;border-bottom:1px solid #f3f4f7;text-align:right;">
+                <a href="results.html" style="font-size:13px;font-weight:500;color:#3b6ce6;text-decoration:none;">Review →</a>
+              </td>
+            </tr>
+            <tr style="cursor:pointer;transition:background 150ms;" onmouseover="this.style.background='#f8f9fb'" onmouseout="this.style.background=''">
+              <td style="padding:13px 20px;font-weight:500;color:#2a3040;">Language Conventions</td>
+              <td style="padding:13px 16px;">
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;background:#f0f5ff;color:#2952c5;border:1px solid #e0ebff;">Practice</span>
+              </td>
+              <td style="padding:13px 16px;color:#525b6e;">Writing</td>
+              <td style="padding:13px 16px;">
+                <span style="font-weight:700;color:#dc2626;">61%</span>
+                <span style="font-size:12px;color:#8b94a6;margin-left:4px;">↓ 3%</span>
+              </td>
+              <td style="padding:13px 16px;color:#8b94a6;">2 days ago</td>
+              <td style="padding:13px 16px;text-align:right;">
+                <a href="results.html" style="font-size:13px;font-weight:500;color:#3b6ce6;text-decoration:none;">Review →</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
